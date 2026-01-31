@@ -151,9 +151,9 @@ M.setup = function(config, global_config)
 	manager.subscribe(M.name, {
 		event = events.NEO_TREE_BUFFER_ENTER,
 		handler = function(args)
-			local bufname = vim.api.nvim_buf_get_name(0)
-			-- neo-tree バッファへの LSP クライアント接続をスキップ
-			if bufname:match("^neo%-tree") then
+			local filetype = vim.api.nvim_buf_get_option(0, "filetype")
+			-- Skip LSP attachment for neo-tree buffers
+			if filetype == "neo-tree" then
 				manager.refresh(M.name)
 				return
 			end
