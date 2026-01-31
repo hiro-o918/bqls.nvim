@@ -96,22 +96,18 @@ M.toggle_directory = function(state, node, path_to_reveal, skip_redraw, recursiv
 		-- project
 		else
 			local project_id = node:get_id()
-			vim.notify("DEBUG: Loading datasets for project: " .. project_id, vim.log.levels.INFO)
 
 			---@param err lsp.ResponseError
 			---@param result any
 			---@param params table
 			local callback_func = function(err, result, params)
-				vim.notify("DEBUG: callback_func called, err=" .. tostring(err), vim.log.levels.INFO)
 				if err then
 					vim.notify("bqls: " .. err.message, vim.log.levels.ERROR)
 					return
 				end
 				if not result then
-					vim.notify("DEBUG: result is nil", vim.log.levels.INFO)
 					return
 				end
-				vim.notify("DEBUG: result.datasets = " .. vim.inspect(result.datasets), vim.log.levels.INFO)
 				local dataset_ids = result.datasets
 				node.children = {}
 				for _, dataset_id in ipairs(dataset_ids) do
@@ -125,13 +121,9 @@ M.toggle_directory = function(state, node, path_to_reveal, skip_redraw, recursiv
 					}
 					table.insert(node.children, dataset_node)
 				end
-				vim.notify("DEBUG: node.children count = " .. #node.children, vim.log.levels.INFO)
 				node.loaded = true
-				vim.notify("DEBUG: About to call renderer.show_nodes", vim.log.levels.INFO)
 				renderer.show_nodes(node.children, state, node:get_id())
-				vim.notify("DEBUG: After renderer.show_nodes", vim.log.levels.INFO)
 			end
-			vim.notify("DEBUG: Calling execute_list_datasets", vim.log.levels.INFO)
 			commands.execute_list_datasets(project_id, callback_func)
 		end
 	elseif node:has_children() then

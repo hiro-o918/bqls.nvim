@@ -57,11 +57,22 @@ end
 
 M.handlers = {
 	["workspace/executeCommand"] = function(err, result, params)
-		if params.params.command == "bqls.executeQuery" then
+		local command = params.params.command
+
+		-- Skip query-related commands for neo-tree buffers to avoid processing buffer names
+		local filetype = vim.api.nvim_buf_get_option(0, "filetype")
+		if filetype == "neo-tree" then
+			-- Allow list commands (listDatasets, listTables) from neo-tree
+			if command ~= "bqls.listDatasets" and command ~= "bqls.listTables" then
+				return
+			end
+		end
+
+		if command == "bqls.executeQuery" then
 			commands.execute_query_handler(err, result, params)
-		elseif params.params.command == "bqls.listJobHistories" then
+		elseif command == "bqls.listJobHistories" then
 			commands.list_job_history_handler(err, result, params)
-		elseif params.params.command == "bqls.saveResult" then
+		elseif command == "bqls.saveResult" then
 			commands.save_result_handler(err, result, params)
 		else
 			vim.lsp.handlers["workspace/executeCommand"](err, result, params)
