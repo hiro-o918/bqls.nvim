@@ -7,6 +7,17 @@ configs.bqls = {
 		filetypes = { "sql", "bigquery" },
 		handlers = require("bqls").handlers,
 		single_file_support = true,
+		on_attach = function(client, bufnr)
+			local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+			if ft == "neo-tree" then
+				vim.notify("Detaching bqls from neo-tree buffer", vim.log.levels.INFO)
+				-- neo-tree バッファに添付されるのを防止する
+				vim.lsp.buf_detach_client(bufnr, client.id)
+				return false
+			end
+			vim.notify("bqls attached", vim.log.levels.INFO)
+			vim.notify("bqls on_attach: " .. ft, vim.log.levels.INFO)
+		end,
 	},
 }
 

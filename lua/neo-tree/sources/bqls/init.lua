@@ -151,28 +151,9 @@ M.setup = function(config, global_config)
 	manager.subscribe(M.name, {
 		event = events.NEO_TREE_BUFFER_ENTER,
 		handler = function(args)
-			local filetype = vim.api.nvim_buf_get_option(0, "filetype")
-			local bufname = vim.api.nvim_buf_get_name(0)
-			vim.notify("DEBUG: NEO_TREE_BUFFER_ENTER - filetype=" .. filetype .. ", bufname=" .. bufname, vim.log.levels.INFO)
-
-			-- Skip LSP attachment for neo-tree buffers
-			if filetype == "neo-tree" then
-				vim.notify("DEBUG: Skipping LSP attachment for neo-tree buffer", vim.log.levels.INFO)
-				-- Ensure LSP client is started but don't attach to this buffer
-				local client = vim.lsp.get_clients({ name = "bqls" })
-				if #client == 0 then
-					vim.notify("DEBUG: Starting bqls client", vim.log.levels.INFO)
-					vim.lsp.start(vim.lsp.config["bqls"])
-				end
-				manager.refresh(M.name)
-				return
-			end
-
-			vim.notify("DEBUG: Attaching LSP client to buffer", vim.log.levels.INFO)
+			-- LSP client は on_attach コールバックで neo-tree バッファへの添付を自動的に防止する
 			local client = vim.lsp.get_clients({ name = "bqls" })
-			if #client == 1 then
-				vim.lsp.buf_attach_client(0, client[1].id)
-			else
+			if #client == 0 then
 				vim.lsp.start(vim.lsp.config["bqls"])
 			end
 			manager.refresh(M.name)
