@@ -151,6 +151,13 @@ M.setup = function(config, global_config)
 	manager.subscribe(M.name, {
 		event = events.NEO_TREE_BUFFER_ENTER,
 		handler = function(args)
+			local bufname = vim.api.nvim_buf_get_name(0)
+			-- neo-tree バッファへの LSP クライアント接続をスキップ
+			if bufname:match("^neo%-tree") then
+				manager.refresh(M.name)
+				return
+			end
+
 			local client = vim.lsp.get_clients({ name = "bqls" })
 			if #client == 1 then
 				vim.lsp.buf_attach_client(0, client[1].id)
