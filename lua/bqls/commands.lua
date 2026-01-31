@@ -145,7 +145,12 @@ end
 --- Unlike `buf_request`, this will collect all the responses from each server instead of handling them.
 --- A map of client_id:request_result will be provided to the callback.
 M.execute_list_datasets = function(project_id, callback)
-	vim.lsp.buf_request(0, "workspace/executeCommand", {
+	local client = vim.lsp.get_clients({ name = "bqls" })
+	if #client == 0 then
+		callback({ error = { message = "bqls client not found" } })
+		return
+	end
+	client[1].request("workspace/executeCommand", {
 		command = "bqls.listDatasets",
 		arguments = { project_id },
 	}, callback)
@@ -158,7 +163,12 @@ end
 --- Unlike `buf_request`, this will collect all the responses from each server instead of handling them.
 --- A map of client_id:request_result will be provided to the callback.
 M.execute_list_tables = function(project_id, dataset_id, callback)
-	vim.lsp.buf_request(0, "workspace/executeCommand", {
+	local client = vim.lsp.get_clients({ name = "bqls" })
+	if #client == 0 then
+		callback({ error = { message = "bqls client not found" } })
+		return
+	end
+	client[1].request("workspace/executeCommand", {
 		command = "bqls.listTables",
 		arguments = { project_id, dataset_id },
 	}, callback)
